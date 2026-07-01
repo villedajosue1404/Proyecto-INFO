@@ -267,7 +267,7 @@ public class AFN {
      */
     public Set<Estado> cambio(Set<Estado> estados, char simbolo) {
         Set<Estado> resultado = new HashSet<>();
-        // itera kada estado buscando transisiones kon el simbolo
+        // Itera sobre cada estado buscando transiciones con el simbolo
         for (Estado e : estados) {
             Map<Character, List<Estado>> trans = tablaTransiciones.get(e);
             if (trans != null && trans.containsKey(simbolo)) {
