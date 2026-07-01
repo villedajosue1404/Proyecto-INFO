@@ -141,11 +141,31 @@ class ParserRegex {
             return expresionInterna;
         }
 
-        // CASO 2: Es una letra o un dígito
+        // CASO 2: 'z' es la cadena vacia lambda
+        if (caracter == 'z') {
+            posicionActual = posicionActual + 1;
+
+            AFN afnLambda = AlgoritmoThompson.crearLambda();
+
+            while (posicionActual < textoRegex.length()) {
+                char operador = textoRegex.charAt(posicionActual);
+                if (operador == '*') {
+                    afnLambda = AlgoritmoThompson.aplicarEstrella(afnLambda);
+                    posicionActual = posicionActual + 1;
+                } else if (operador == '+') {
+                    afnLambda = AlgoritmoThompson.aplicarMas(afnLambda);
+                    posicionActual = posicionActual + 1;
+                } else break;
+            }
+
+            return afnLambda;
+        }
+
+        // CASO 3: Es una letra o un digito (excluye 'z' porque ya se uso arriba)
         boolean esLetra = false;
         boolean esDigito = false;
 
-        if (caracter >= 'a' && caracter <= 'z') esLetra = true;
+        if (caracter >= 'a' && caracter <= 'y') esLetra = true;
         if (caracter >= 'A' && caracter <= 'Z') esLetra = true;
         if (caracter >= '0' && caracter <= '9') esDigito = true;
 

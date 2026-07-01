@@ -17,8 +17,21 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Arma un AFN chiquito para un solo símbolo. 
-     * Solo hace un puente directo del estado inicial al final.*/
+     * Arma un AFN para la cadena vacia lambda
+     * Crea un inicio y un final con un salto vacio directo
+     */
+    public static AFN crearLambda() {
+        Estado inicio = nuevoEstado();
+        Estado fin = nuevoEstado();
+        AFN afn = new AFN(inicio, fin);
+        afn.agregarTransicion(inicio, fin, 'ε');
+        return afn;
+    }
+
+    /**
+     * Arma un AFN chiquito para un solo simbolo
+     * Solo hace un puente directo del estado inicial al final
+     */
     public static AFN crearSimbolo(char simbolo) {
         Estado inicio = nuevoEstado();
         Estado fin = nuevoEstado();
