@@ -65,6 +65,7 @@ class ParserRegex {
                 }
             } else {
                 // Ya no hay mas pipes entonces salimos del ciclo
+                break;
             }
         }
 

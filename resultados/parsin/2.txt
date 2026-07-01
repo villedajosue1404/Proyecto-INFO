@@ -1,0 +1,9 @@
+ac:true
+abc:true
+abbc:true
+abbbc:true
+:false
+a:false
+c:false
+ab:false
+bc:false

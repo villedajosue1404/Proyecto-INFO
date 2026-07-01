@@ -1,0 +1,11 @@
+abb:false
+aabb:false
+bababb:false
+aaabb:false
+bbbbabb:false
+:false
+a:false
+ab:false
+abba:false
+bba:false
+abab:false

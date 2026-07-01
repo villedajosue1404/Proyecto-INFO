@@ -1,0 +1,12 @@
+aaa:true
+aab:true
+aba:true
+abb:true
+baaa:true
+baab:true
+aaba:true
+:false
+a:false
+ab:false
+ba:false
+bb:false
