@@ -1,0 +1,8 @@
+ε
+a
+b
+ab
+ba
+aba
+c
+abc

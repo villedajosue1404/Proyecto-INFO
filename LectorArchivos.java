@@ -3,34 +3,40 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Proporciona metodos estaticos para leer archivos del disco
+ * Diferencia entre archivos .er y archivos normales
+ * Los archivos .er solo devuelven la primera linea
+ * Los demas archivos devuelven todo su contenido
+ */
 public class LectorArchivos {
 
+    /**
+     * Lee el contenido completo de un archivo desde la ruta especificada
+     * Si el archivo tiene extension .er solo toma la primera linea sin espacios
+     * Para cualquier otro archivo devuelve todo el texto con saltos de linea
+     * @param ruta la direccion del archivo a leer
+     * @return el texto completo del archivo
+     * @throws RuntimeException si ocurre un error de entrada o salida
+     */
     public static String leerArchivo(String ruta) {
         try {
             List<String> lineas = Files.readAllLines(Paths.get(ruta));
-            String[] partes = ruta.split("\\.");
-            
-            if (partes.length > 1) {
-                String extension = partes[partes.length - 1].toLowerCase();
-                
-                if (extension.equals("txt")) {
-                    return procesarTXT(lineas);
-                } else if (extension.equals("afd")) {
-                    // Une toda la lista en un solo String separado por saltos de línea
-                    return String.join("\n", lineas);
-                } else {
-                    System.out.println(extension + " no soportada. Solo leo .txt o .afd");
-                    return null;
-                }
-            }
-            return null;
-        } catch (IOException e) {
-            System.out.println("[ERROR] No se pudo encontrar o leer el archivo en: " + ruta);
-            return null;
-        }
-    }
 
-    private static String procesarTXT(List<String> lineas) {
-        return lineas.get(1).trim();
+            // Extrae la extension del archivo para decidir como procesarlo
+            String extension = ruta.contains(".")
+                    ? ruta.substring(ruta.lastIndexOf('.') + 1).toLowerCase()
+                    : "";
+
+            // Si es .ER solo tomamos la primera linea sin espacios
+            if (extension.equals("er")) {
+                return lineas.get(0).trim();
+            }
+
+            // Para los demas archivos devolvemos el texto completo
+            return String.join("\n", lineas);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
