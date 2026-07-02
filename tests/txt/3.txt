@@ -1,4 +1,4 @@
-ab
+b
 aabb
 ababb
 aaab
