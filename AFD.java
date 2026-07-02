@@ -563,4 +563,113 @@ class AFD {
             if (f == estadoActual) { esFinal = true; break; }
         }
 
-        return new ResultadoValidacion(traza.toString(),
+        return new ResultadoValidacion(traza.toString(), esFinal);
+    }
+
+    /**
+     * Arma la tabla de transiciones en texto para mostrar
+     * Pone el alfabeto los estados y a donde se mueve cada uno
+     * Si no hay camino se pone E para el estado de error
+     */
+    public String formatearTransiciones() {
+        Set<Estado> todosEstados = obtenerTodosLosEstados();
+        for (Estado est : transiciones.keySet()) {
+            Map<Character, Estado> transE = transiciones.get(est);
+            if (transE != null) {
+                for (Estado dest : transE.values()) {
+                    todosEstados.add(dest);
+                }
+            }
+        }
+
+        if (todosEstados.isEmpty()) return "";
+
+        java.util.List<Estado> listaEstados = new java.util.ArrayList<>(todosEstados);
+        java.util.Collections.sort(listaEstados);
+
+        boolean necesitaError = false;
+        for (Estado est : listaEstados) {
+            for (char simbolo : alfabeto) {
+                Map<Character, Estado> transE = transiciones.get(est);
+                if (transE == null || !transE.containsKey(simbolo)) {
+                    necesitaError = true;
+                    break;
+                }
+            }
+            if (necesitaError) break;
+        }
+
+        if (necesitaError) {
+            listaEstados.add(new Estado(Integer.MAX_VALUE));
+        }
+
+        java.util.Map<Integer, Integer> mapaRemapeo = new java.util.TreeMap<>();
+        int idx = 0;
+        for (Estado e : listaEstados) {
+            mapaRemapeo.put(e.getId(), idx);
+            idx++;
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        boolean primero = true;
+        for (char c : alfabeto) {
+            if (!primero) sb.append(",");
+            sb.append(c);
+            primero = false;
+        }
+        sb.append("\n");
+
+        sb.append(listaEstados.size()).append("\n");
+
+        boolean primeroF = true;
+        for (Estado f : estadosFinales) {
+            if (!primeroF) sb.append(",");
+            Integer remapeado = mapaRemapeo.get(f.getId());
+            if (remapeado != null) {
+                sb.append(remapeado);
+            }
+            primeroF = false;
+        }
+        sb.append("\n");
+
+        for (char simbolo : alfabeto) {
+            boolean primeroE = true;
+            for (Estado est : listaEstados) {
+                if (!primeroE) sb.append(",");
+                Map<Character, Estado> transE = transiciones.get(est);
+                if (transE != null && transE.containsKey(simbolo)) {
+                    sb.append(mapaRemapeo.get(transE.get(simbolo).getId()));
+                } else {
+                    sb.append("E");
+                }
+                primeroE = false;
+            }
+            sb.append(".\n");
+        }
+
+        return sb.toString();
+    }
+}
+
+/**
+ * Guarda el resultado de validar con traza
+ * el camino de estados que se siguio y si la cadena fue aceptada
+ */
+class ResultadoValidacion {
+    public String traza;
+    public boolean aceptada;
+
+    public ResultadoValidacion(String traza, boolean aceptada) {
+        this.traza = traza;
+        this.aceptada = aceptada;
+    }
+}
+
+/**
+ * Sirve para agrupar estados en el algoritmo
+ * de partir grupos cuando minimizamos el AFD
+ */
+class Grupo {
+    ArrayList estados = new ArrayList();
+}
