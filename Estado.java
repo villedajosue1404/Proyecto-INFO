@@ -1,44 +1,34 @@
 /**
- * Representa un estado dentro de un automata AFN o AFD
- * Cada estado tiene un identificador unico numerico
- * Implementa Comparable para poder ordenarse en TreeMap y TreeSet
- */
+ * Esto es un estado para los autómatas AFN o AFD.
+ * Cada uno tiene un ID numérico único. 
+ * Sirve para que se puedan ordenar de menor a mayor automáticamente 
+ * al meterlos en colecciones como TreeSet o TreeMap.*/
 public class Estado implements Comparable<Estado> {
     private int id;
 
     /**
-     * Constructor que asigna el identificador al estado
-     * @param id el numero unico que identifica a este estado
-     */
+     * Crea el estado y le asigna su número de ID.*/
     public Estado(int id) {
         this.id = id;
     }
 
     /**
-     * Devuelve el identificador numero de este estado
-     * @return el id del estado
-     */
+     * Te da el ID del estado.*/
     public int getId() {
         return id;
     }
 
     /**
-     * Compara este estado con otro usando su id
-     * Permite ordenar los estados de menor a mayor
-     * Necesario para usar TreeMap y TreeSet
-     * @param otro el estado con el que se compara
-     * @return negativo cero o positivo segun el orden
-     */
+     * Compara el ID de este estado con otro.
+     * Sirve para que las colecciones ordenadas sepan quién va primero.*/
     @Override
     public int compareTo(Estado otro) {
         return Integer.compare(this.id, otro.id);
     }
 
     /**
-     * Devuelve el nombre del estado en formato q mas el id
-     * Por ejemplo q0 q1 q2 etc
-     * @return la representacion en texto del estado
-     */
+     * Arma el nombre del estado para imprimirlo bonito.
+     * Le pone una 'q' antes del número.*/
     @Override
     public String toString() {
         return "q" + id;

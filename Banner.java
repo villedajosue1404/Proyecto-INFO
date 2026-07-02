@@ -1,11 +1,13 @@
-import java.util.Scanner;
 
-// Clase separada solo para el diseño del título con degradado SUAVE y flores
+/**
+ * Clase separada solo para darle estilo al título.
+ * Imprime letras grandes con un degradado de color suave y 
+ * le pone unas flores a los lados para que se vea bien en la consola.*/
 class Banner {
     
-    // Colores de inicio y fin (RGB) para el texto
-    private static final int[] COLOR_INICIO_RGB = {255, 153, 204}; // Rosa
-    private static final int[] COLOR_FIN_RGB = {102, 204, 255};   // Celeste
+    // Colores de inicio (Rosa) y fin (Celeste) en formato RGB para el texto
+    private static final int[] COLOR_INICIO_RGB = {255, 153, 204};
+    private static final int[] COLOR_FIN_RGB = {102, 204, 255};   
     
     private static final String[] BANNER = {
         "  ███╗   ███╗███████╗██╗       ██╗   ██╗   ██████╗ █████╗ ███╗   ███╗██╗  ",
@@ -17,11 +19,9 @@ class Banner {
     };
 
     /**
-     * Imprime una línea de texto carácter por carácter RGB suave
-     * @param linea L
-     * @param colorInicio 
-     * @param colorFin 
-     */
+     * Imprime una línea de texto pintando letra por letra.
+     * Calcula el color exacto entre el inicio y el fin dependiendo de 
+     * la posición de la letra para hacer un degradado bien suave.*/
     private static void imprimirLineaConDegradadoSuave(String linea, int[] colorInicio, int[] colorFin) {
         int len = linea.length();
         if (len == 0) return;
@@ -35,10 +35,14 @@ class Banner {
             
             System.out.print("\033[38;2;" + r + ";" + g + ";" + b + "m" + linea.charAt(i));
         }
-        // Resetear el color al final de cada línea
+        // Le quita el color al final de la línea para no manchar lo demás
         System.out.println("\033[0m");
     }
 
+    /**
+     * Dibuja todo el título en la consola.
+     * Pone unas flores coloridas arriba, luego el texto con su degradado
+     * y remata con otras flores abajo.*/
     public static void imprimirBanner() {
         String amarillo = "\033[38;2;255;255;153m";
         String lila = "\033[38;2;204;153;255m";

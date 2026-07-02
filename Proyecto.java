@@ -2,17 +2,15 @@ import java.util.Scanner;
 import util.Banner;
 
 /**
- * Clase principal del programa punto de entrada del proyecto
- * Presenta un menu interactivo con opciones para cargar archivos
- * Convertir expresiones regulares a AFD minimizar automatas
- * Validar cadenas con parsing y ejecutar pruebas unitarias
+ * Clase principal y menú del programa. 
+ * Te deja cargar archivos, convertir Expresiones Regulares a AFD, 
+ * minimizar autómatas, validar cadenas y correr pruebas.
  */
 public class Proyecto {
 
     /**
-     * Metodo principal que ejecuta el programa en un ciclo infinito
-     * Muestra el banner y el menu de opciones en cada iteracion
-     * Permite cargar archivos ER y AFD convertir minimizar validar y probar
+     * Ciclo principal que mantiene el menú vivo. 
+     * Atrapa la opción que elijas y manda a llamar a la función que toca.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -40,21 +38,21 @@ public class Proyecto {
 
             switch (opcion) {
                 case 1:
-                    // Guarda la ruta del archivo ER para usarlo despues
+                    // Solo guarda la ruta del archivo ER para usarla luego
                     System.out.print("\n Ingresa la direccion del archivo ER: ");
                     archivoER = scanner.nextLine();
                     System.out.println(" Archivo ER guardado en memoria.");
                     break;
 
                 case 2:
-                    // Guarda la ruta del archivo AFD para usarlo despues
+                    // Solo guarda la ruta del archivo AFD para usarla luego
                     System.out.print("\n Ingresa la direccion del archivo AFD: ");
                     archivoAFD = scanner.nextLine();
                     System.out.println(" Archivo AFD guardado en memoria.");
                     break;
 
                 case 3:
-                    // Lee la expresion regular construye el AFN y lo convierte a AFD
+                    // Lee la ER, arma el AFN de Thompson y lo pasa directo a AFD
                     System.out.println("\n--- PASAR ER A AFD ---");
                     System.out.print(" Direccion del archivo ER: ");
                     archivoER = scanner.nextLine();
@@ -76,7 +74,7 @@ public class Proyecto {
                     break;
 
                 case 4:
-                    // Lee un AFD verifica si es minimo y si no lo minimiza
+                    // Carga un AFD, revisa si ya es mínimo y si no, lo achica
                     System.out.println("\n--- CREAR AFD MINIMO ---");
 
                     System.out.print(" Direccion del archivo AFD: ");
@@ -105,7 +103,7 @@ public class Proyecto {
                     break;
 
                 case 5:
-                    // Lee un AFD y evalua si una cadena ingresada por el usuario es aceptada
+                    // Carga el AFD y te dice si acepta o batea tu cadena
                     System.out.println("\n--- PARSING ---");
 
                     System.out.print(" Direccion del archivo AFD: ");
@@ -127,10 +125,11 @@ public class Proyecto {
                     break;
 
                 case 6:
-                    // Abre el modulo de pruebas unitarias para ejecutar tests
+                    // Salta directo a la sección de pruebas (tests)
                     System.out.println("\n Entrando al area de pruebas...");
                     TestProyecto.iniciar(scanner);
                     break;
+                    
                 case 0:
                     salir = true;
                     System.out.println("\nSaliendo del programa... Bye bye!");

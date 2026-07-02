@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,26 +8,19 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 /**
- * Implementacion de un automata finito no determinista AFN
- * Contiene un estado inicial y un estado final
- * Almacena las transiciones en un mapa que asocia estado origen con
- * un mapa de simbolo a lista de estados destino soportando no determinismo
- * Se utiliza como paso intermedio para convertir expresiones regulares a AFD
- */
+ * Esto es un autómata finito no determinista (AFN).
+ * Sirve para guardar el estado inicial y final, y todas las rutas posibles
+ * incluyendo saltos vacíos para luego pasarlo a AFD.*/
 public class AFN {
     private Estado estadoInicial;
     private Estado estadoFinal;
     
-    // Mapa de transiciones asociando cada estado origen a su tabla de simbolos y destinos
+    // Mapa de transiciones asociando cada estado origen a su tabla de símbolos y destinos
     private Map<Estado, Map<Character, List<Estado>>> tablaTransiciones;
 
     /**
-     * Constructor que crea un AFN con los estados inicial y final especificados
-     * Inicializa el mapa de transiciones como un TreeMap para mantener el orden
-     * Agrega ambos estados al mapa de transiciones
-     * @param estadoInicial el estado donde empieza el automata
-     * @param estadoFinal el estado donde el automata acepta la cadena
-     */
+     * Crea el AFN con su estado inicial y final.
+     * Deja lista la tabla de transiciones para ir agregando los caminos.*/
     public AFN(Estado estadoInicial, Estado estadoFinal) {
         this.estadoInicial = estadoInicial;
         this.estadoFinal = estadoFinal;
@@ -39,22 +31,14 @@ public class AFN {
     }
 
     /**
-     * Agrega un estado a la tabla de transiciones si no existe ya
-     * Utiliza putIfAbsent para evitar sobrescribir estados existentes
-     * @param e el estado a agregar
-     */
+     * Mete un estado a la tabla solo si no existe todavía.*/
     public void agregarEstado(Estado e) {
         tablaTransiciones.putIfAbsent(e, new HashMap<>());
     }
 
     /**
-     * Agrega una transicion desde un estado origen a un estado destino con un simbolo
-     * Si los estados no existen en la tabla los agrega automaticamente
-     * Soporta multiples destinos para el mismo origen y simbolo no determinismo
-     * @param origen el estado de donde parte la transicion
-     * @param destino el estado al que llega la transicion
-     * @param simbolo el caracter que activa la transicion
-     */
+     * Arma un puente entre dos estados usando un símbolo.
+     * Como es no determinista, puede haber varios destinos para el mismo origen y símbolo.*/
     public void agregarTransicion(Estado origen, Estado destino, char simbolo) {
         agregarEstado(origen);
         agregarEstado(destino);
@@ -65,28 +49,19 @@ public class AFN {
     }
 
     /**
-     * Devuelve el estado inicial del automata
-     * @return el estado inicial
-     */
+     * Te da el estado inicial del autómata.*/
     public Estado getEstadoInicial() { return estadoInicial; }
     
     /**
-     * Devuelve el estado final del automata
-     * @return el estado final
-     */
+     * Te da el estado final del autómata.*/
     public Estado getEstadoFinal() { return estadoFinal; }
     
     /**
-     * Devuelve el mapa completo de transiciones del automata
-     * @return el mapa de transiciones
-     */
+     * Te da toda la tabla de caminos armados.*/
     public Map<Estado, Map<Character, List<Estado>>> getTablaTransiciones() { return tablaTransiciones; }
 
     /**
-     * Imprime el automata en la consola para depuracion
-     * Muestra el estado inicial el estado final y todas las transiciones
-     * Cada transicion se muestra en formato origen --simbolo--> destino
-     */
+     * Imprime el AFN en la consola para que lo veas bonito.*/
     public void imprimirAutomata() {
         System.out.println("--- AFN Generado ---");
         System.out.println("Inicio: " + estadoInicial);
@@ -105,12 +80,9 @@ public class AFN {
     }
 
     /**
-     * Genera una representacion en texto de las transiciones en formato tabla
-     * Similar al formato usado por AFD con NT para indicar que no hay transicion
-     * Incluye el alfabeto el numero de estados el estado final y las transiciones
-     * Las transiciones epsilon se incluyen al final si existen
-     * @return el string formateado con todas las transiciones
-     */
+     * Arma la tabla de transiciones en texto.
+     * Pone el alfabeto, los estados y a dónde se mueve cada uno.
+     * Si no hay camino, se pone un "NT".*/
     public String formatearTransiciones() {
         java.util.List<Estado> listaEstados = new java.util.ArrayList<>(tablaTransiciones.keySet());
         java.util.Collections.sort(listaEstados);
@@ -146,7 +118,7 @@ public class AFN {
         // linea 3: estado final
         sb.append(estadoFinal.getId()).append("\n");
 
-        // lineas de transiciones: una por simbolo
+        // lineas de transiciones: una por símbolo
         for (char simbolo : alfabeto) {
             boolean primeroE = true;
             for (Estado est : listaEstados) {
@@ -194,11 +166,8 @@ public class AFN {
     }
 
     /**
-     * Obtiene el conjunto de simbolos del alfabeto que usa el automata
-     * Excluye el caracter epsilon porque no es parte del alfabeto de entrada
-     * Itera sobre todas las transiciones recolectando los simbolos distintos
-     * @return el conjunto de simbolos del alfabeto
-     */
+     * Saca todos los símbolos que usa el autómata,
+     * ignorando los saltos vacíos (épsilon).*/
     public Set<Character> getAlfabeto() {
         Set<Character> alfabeto = new HashSet<>();
         for (Map<Character, List<Estado>> trans : tablaTransiciones.values()) {
@@ -212,25 +181,20 @@ public class AFN {
     }
 
     /**
-     * Calcula la clausura epsilon desde un estado individual
-     * La clausura epsilon incluye el mismo estado y todos los estados
-     * alcanzables mediante una o mas transiciones epsilon
-     * Usa una pila para realizar un recorrido en profundidad
-     * @param estado el estado desde el cual calcular la clausura
-     * @return el conjunto de estados alcanzables via epsilon
-     */
+     * Saca todos los estados a los que puedes llegar
+     * desde un estado usando puros saltos vacíos.*/
     public Set<Estado> clausuraLambda(Estado estado) {
         Set<Estado> resultado = new HashSet<>();
         Stack<Estado> pila = new Stack<>();
         pila.push(estado);
 
-        // Recorremos la pila buscando estados con transiciones epsilon
+        // Recorremos la pila buscando estados con transiciones épsilon
         while (!pila.isEmpty()) {
             Estado actual = pila.pop();
             if (!resultado.contains(actual)) {
                 resultado.add(actual);
                 Map<Character, List<Estado>> trans = tablaTransiciones.get(actual);
-                // Si el estado tiene transiciones epsilon las seguimos
+                // Si el estado tiene transiciones épsilon las seguimos
                 if (trans != null && trans.containsKey('ε')) {
                     for (Estado dest : trans.get('ε')) {
                         pila.push(dest);
@@ -243,12 +207,8 @@ public class AFN {
     }
 
     /**
-     * Calcula la clausura epsilon para un conjunto de estados
-     * Combina las clausuras individuales de cada estado en el conjunto
-     * Util para la conversion de AFN a AFD por subconjuntos
-     * @param estados el conjunto de estados desde los cuales calcular
-     * @return la union de todas las clausuras epsilon del conjunto
-     */
+     * Hace lo mismo que el anterior, pero para un grupo entero de estados.
+     * Los junta todos en un solo paquete.*/
     public Set<Estado> clausuraLambda(Set<Estado> estados) {
         Set<Estado> resultado = new HashSet<>();
         for (Estado e : estados) {
@@ -258,16 +218,11 @@ public class AFN {
     }
 
     /**
-     * Calcula los estados alcanzables desde un conjunto de estados con un simbolo
-     * Para cada estado en el conjunto busca si existe una transicion con el simbolo
-     * No incluye la clausura epsilon eso se hace despues
-     * @param estados el conjunto de estados de partida
-     * @param simbolo el caracter de la transicion
-     * @return los estados destino alcanzados con el simbolo
-     */
+     * Se fija a dónde llegas desde un grupo de estados
+     * consumiendo un solo símbolo, sin contar los saltos vacíos acá. */
     public Set<Estado> cambio(Set<Estado> estados, char simbolo) {
         Set<Estado> resultado = new HashSet<>();
-        // Itera sobre cada estado buscando transiciones con el simbolo
+        // Itera sobre cada estado buscando transiciones con el símbolo
         for (Estado e : estados) {
             Map<Character, List<Estado>> trans = tablaTransiciones.get(e);
             if (trans != null && trans.containsKey(simbolo)) {

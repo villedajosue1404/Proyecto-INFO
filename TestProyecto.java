@@ -1,15 +1,14 @@
-import java.util.Scanner;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 import util.Banner;
 import util.BannerTest;
 
 /**
- * Panel de control de pruebas unitarias del proyecto
- * Proporciona menus para ejecutar pruebas individuales o masivas
- * Evalua automatas AFN AFD y parsing de cadenas
- * Calcula calificaciones y guarda resultados en archivos
+ * Menú interactivo para correr las pruebas  del proyecto.
+ * Evalúa que los AFN, AFD y la validación de cadenas funcionen bien, 
+ * y te saca una calificación final guardando los resultados.
  */
 public class TestProyecto {
 
@@ -18,8 +17,7 @@ public class TestProyecto {
     private static int pruebasFallidas = 0;
 
     /**
-     * Punto de entrada del panel de pruebas
-     * Crea un scanner lo pasa al metodo iniciar y lo cierra al terminar
+     * Arranca el panel de pruebas.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -28,11 +26,8 @@ public class TestProyecto {
     }
 
     /**
-     * Menu principal del panel de pruebas
-     * Se repite en ciclo hasta que el usuario elija salir
-     * Ofrece test individual test todos borrar resultados y salir
-     * Muestra el banner de presentacion al inicio
-     * @param scanner el lector de entrada del usuario
+     * Menú principal de pruebas. 
+     * Te deja elegir si probar un solo archivo, todos a la vez o limpiar resultados.
      */
     public static void iniciar(Scanner scanner) {
         int opcion;
@@ -58,8 +53,7 @@ public class TestProyecto {
     }
 
     /**
-     * Pide al usuario el nombre del test y abre el menu para un solo test
-     * @param scanner el lector de entrada del usuario
+     * Te pide el nombre del test y abre su menú específico.
      */
     private static void testIndividual(Scanner scanner) {
         System.out.print("\n Ingresa el nombre del test: ");
@@ -68,8 +62,7 @@ public class TestProyecto {
     }
 
     /**
-     * Descubre todos los tests disponibles y abre el menu multiple
-     * @param scanner el lector de entrada del usuario
+     * Busca todos los tests guardados y abre el menú para correrlos todos.
      */
     private static void testTodos(Scanner scanner) {
         String[] tests = descubrirTests();
@@ -77,11 +70,8 @@ public class TestProyecto {
     }
 
     /**
-     * Menu para ejecutar pruebas sobre todos los tests descubiertos
-     * Ofrece opciones para ejecutar todas las etapas o solo algunas
-     * Muestra la nota final con total de correctas e incorrectas
-     * @param scanner el lector de entrada del usuario
-     * @param tests el arreglo con los nombres de los tests a ejecutar
+     * Menú para correr las pruebas en varios archivos al mismo tiempo.
+     * Al final te muestra cuántas pasaste y tu nota sobre 10.
      */
     private static void menuTestMultiple(Scanner scanner, String[] tests) {
         int opcion;
@@ -127,7 +117,7 @@ public class TestProyecto {
                 System.out.println();
             }
 
-            // Mostramos la nota final solo para las opciones que generan calificacion
+            // Muestra la nota final solo si es una prueba calificada
             if (opcion == 1 || opcion == 3 || opcion == 5) {
                 System.out.println("========================================");
                 System.out.println("   NOTA FINAL");
@@ -142,11 +132,7 @@ public class TestProyecto {
     }
 
     /**
-     * Menu para ejecutar pruebas sobre un solo test especifico
-     * Ofrece las mismas opciones que el menu multiple
-     * Se repite hasta que el usuario elija volver
-     * @param scanner el lector de entrada del usuario
-     * @param nombre el nombre del test a ejecutar
+     * Menú para hacerle las pruebas a un solo archivo.
      */
     private static void menuTest(Scanner scanner, String nombre) {
         int opcion;
@@ -176,7 +162,6 @@ public class TestProyecto {
                 });
             }
 
-            // Ejecutamos la opcion seleccionada por el usuario
             switch (opcion) {
                 case 1 -> ejecutarTodo(nombre);
                 case 2 -> ejecutarSoloAFN(nombre);
@@ -190,10 +175,7 @@ public class TestProyecto {
     }
 
     /**
-     * Lee una expresion regular desde el archivo de test
-     * La convierte en AFN usando el parser y muestra las transiciones
-     * Si la expresion es vacia no genera AFN y muestra una advertencia
-     * @param nombre el nombre del test a ejecutar
+     * Arma el AFN usando el parser y te muestra por dónde van los caminos.
      */
     private static void ejecutarSoloAFN(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -215,11 +197,8 @@ public class TestProyecto {
     }
 
     /**
-     * Genera o carga un AFD lo minimiza y lo compara con el esperado
-     * Si el AFD no es minimo lo minimiza automaticamente
-     * Compara el resultado contra el archivo .expafd esperado
-     * Guarda el resultado en la carpeta resultados/afd/
-     * @param nombre el nombre del test a ejecutar
+     * Minimiza el AFD y revisa si es exactamente igual al que se esperaba.
+     * Luego guarda el resultado.
      */
     private static void ejecutarSoloAFD(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -230,7 +209,7 @@ public class TestProyecto {
 
         AFD afd = cargarGenerarAFD(nombre);
 
-        // Si el automata no es minimo procedemos a minimizarlo
+        // Si no está minimizado, lo minimiza de una
         if (!afd.esMinimo()) {
             System.out.println(" Minimizando...");
             afd = afd.minimizar();
@@ -242,7 +221,7 @@ public class TestProyecto {
         System.out.println("\n Transiciones (formato solicitado):");
         System.out.println(afd.formatearTransiciones());
 
-        // Comparamos las transiciones obtenidas contra el archivo esperado
+        // Revisa si cuadra con lo que el test pedía
         String expafd = LectorArchivos.leerArchivo(expafdFile);
         String obtenido = afd.formatearTransiciones();
         totalPruebas++;
@@ -259,7 +238,7 @@ public class TestProyecto {
             pruebasFallidas++;
         }
 
-        // Guardamos el resultado obtenido en la carpeta resultados/afd/
+        // Guarda el resultado en un archivo
         String resultadoAFDFile = "resultados/afd/" + nombre + ".afd";
         new File("resultados/afd/").mkdirs();
         try (FileWriter fw = new FileWriter(resultadoAFDFile)) {
@@ -269,11 +248,8 @@ public class TestProyecto {
     }
 
     /**
-     * Lee las cadenas del archivo .txt y las evalua con el AFD
-     * Compara cada resultado contra el booleano esperado del .exparsin
-     * Lleva el conteo de pruebas correctas e incorrectas
-     * Guarda los resultados en la carpeta resultados/parsin/
-     * @param nombre el nombre del test a ejecutar
+     * Pasa las cadenas de texto por el AFD para ver si las acepta o rechaza.
+     * Revisa contra el archivo .exparsin para ver si le atinaste.
      */
     private static void ejecutarSoloParsing(String nombre) {
         String txtFile = "tests/txt/" + nombre + ".txt";
@@ -294,7 +270,7 @@ public class TestProyecto {
         int tInicio = totalPruebas;
 
         System.out.println(" Validacion de cadenas:");
-        // Evaluamos cada cadena contra el automata AFD
+        // Pone a prueba cada cadena
         for (int i = 0; i < minLen; i++) {
             String cadena = cadenas[i].trim();
             if (cadena.equals("\u03B5")) cadena = "";
@@ -316,7 +292,7 @@ public class TestProyecto {
         int tDelta = totalPruebas - tInicio;
         System.out.println(" Parsing: " + pDelta + "/" + tDelta + " correctas");
 
-        // Guardamos los resultados de validacion en la carpeta resultados/parsin/
+        // Guarda el reporte de cadenas
         String resultadoParsinFile = "resultados/parsin/" + nombre + ".txt";
         new File("resultados/parsin/").mkdirs();
         try (FileWriter fw = new FileWriter(resultadoParsinFile)) {
@@ -333,10 +309,8 @@ public class TestProyecto {
     }
 
     /**
-     * Ejecuta todas las etapas del test AFN AFD y Parsing
-     * Muestra la nota final con el total de pruebas correctas
-     * Calcula la calificacion sobre 10 puntos
-     * @param nombre el nombre del test a ejecutar
+     * Ejecuta el paquete completo: AFN, AFD y Parsing de un solo, 
+     * dándote tu nota al final.
      */
     private static void ejecutarTodo(String nombre) {
         System.out.println("\n========== TEST COMPLETO: " + nombre + " ==========");
@@ -364,9 +338,7 @@ public class TestProyecto {
     }
 
     /**
-     * Carga o genera un AFD sin minimizar y muestra sus transiciones
-     * Indica si el automata actual ya es minimo o no
-     * @param nombre el nombre del test a ejecutar
+     * Te enseña el AFD tal cual salió de la Expresión Regular, sin minimizarlo.
      */
     private static void ejecutarSoloAFDOriginal(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -382,10 +354,7 @@ public class TestProyecto {
     }
 
     /**
-     * Carga un AFD y lo minimiza mostrando ambos estados
-     * Muestra el AFD original y luego el AFD minimizado
-     * Si ya es minimo solo muestra el original
-     * @param nombre el nombre del test a ejecutar
+     * Te muestra el antes y el después de aplicarle la minimización a un AFD.
      */
     private static void ejecutarPasarAFDaAFDMin(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -407,10 +376,7 @@ public class TestProyecto {
     }
 
     /**
-     * Carga o genera un AFD desde el archivo ER del test sin minimizar
-     * Si la generacion falla intenta leer un archivo .afd existente
-     * @param nombre el nombre del test a cargar
-     * @return el AFD generado o cargado sin minimizar
+     * Genera el AFD o lo carga desde archivo, pero NO lo minimiza.
      */
     private static AFD cargarAFDSinMinimizar(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -420,7 +386,7 @@ public class TestProyecto {
             String er = LectorArchivos.leerArchivo(erFile);
             AFN afn = ParserRegex.parse(er);
             return AFD.desdeAFN(afn);
-        // Si no se pudo generar desde ER leemos el archivo AFD existente
+        // Si falla al armarlo, trata de leerlo de un archivo
         } catch (Exception e) {
             String contenido = LectorArchivos.leerArchivo(afdFile);
             return AFD.desdeFormatoArchivo(contenido);
@@ -428,11 +394,7 @@ public class TestProyecto {
     }
 
     /**
-     * Carga o genera un AFD desde la ER del test y lo minimiza
-     * Si la generacion falla intenta leer un archivo .afd existente
-     * Garantiza que el resultado sea un AFD minimo
-     * @param nombre el nombre del test a cargar
-     * @return el AFD minimo generado o cargado
+     * Genera el AFD y se asegura de que sí o sí esté minimizado antes de devolverlo.
      */
     private static AFD cargarGenerarAFD(String nombre) {
         String erFile = "tests/er/" + nombre + ".er";
@@ -443,12 +405,13 @@ public class TestProyecto {
             String er = LectorArchivos.leerArchivo(erFile);
             AFN afn = ParserRegex.parse(er);
             afd = AFD.desdeAFN(afn);
-        // Si no se pudo generar desde ER leemos el archivo AFD existente
+        // Si falla al armarlo, trata de leerlo de un archivo
         } catch (Exception e) {
             String contenido = LectorArchivos.leerArchivo(afdFile);
             afd = AFD.desdeFormatoArchivo(contenido);
         }
-        // Garantizamos que el AFD quede minimizado antes de devolverlo
+        
+        // Verifica y minimiza si hace falta
         if (!afd.esMinimo()) {
             afd = afd.minimizar();
         }
@@ -456,10 +419,7 @@ public class TestProyecto {
     }
 
     /**
-     * Descubre los nombres de todos los tests disponibles
-     * Busca archivos .er en tests/er/ y .afd en tests/afd/
-     * Combina los nombres en un conjunto ordenado sin duplicados
-     * @return un arreglo con los nombres de los tests ordenados
+     * Revisa las carpetas de pruebas para ver qué archivos hay disponibles.
      */
     private static String[] descubrirTests() {
         java.util.Set<String> nombres = new java.util.TreeSet<>();
@@ -484,9 +444,7 @@ public class TestProyecto {
     }
 
     /**
-     * Elimina todos los resultados guardados de pruebas anteriores
-     * Borra las carpetas resultados/afd/ y resultados/parsin/
-     * Muestra un mensaje de confirmacion al terminar
+     * Borra todo lo que esté en las carpetas de resultados para empezar en blanco.
      */
     private static void limpiarResultados() {
         Banner.mostrar("Borrar resultados");
@@ -496,11 +454,11 @@ public class TestProyecto {
     }
 
     /**
-     * Elimina todos los archivos dentro de un directorio
-     * Itera sobre los archivos y los borra uno por uno
-     * @param dir el directorio cuyo contenido se va a eliminar
+     * Vacía una carpeta borrando archivo por archivo.
      */
     private static void borrarDir(File dir) {
-        for (File f : dir.listFiles()) f.delete();
+        if (dir.listFiles() != null) {
+            for (File f : dir.listFiles()) f.delete();
+        }
     }
 }

@@ -2,29 +2,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implementacion del algoritmo de construccion de Thompson
- * Convierte expresiones regulares en automatas finitos no deterministas AFN
- * Soporta creacion de simbolos concatenacion union estrella de Kleene y mas
- * Cada operacion construye un AFN con estados conectados por epsilon
- */
+ * Esto es el algoritmo de Thompson.
+ * Sirve para armar un AFN a partir de expresiones regulares, 
+ * uniendo pedacitos con saltos vacíos para formar operaciones 
+ * como uniones, concatenaciones o ciclos.*/
 public class AlgoritmoThompson {
     private static int contadorEstados = 0;
 
     /**
-     * Crea un nuevo estado con un id autoincremental
-     * El contador es estatico por lo que los ids son unicos globalmente
-     * @return el nuevo estado creado
-     */
+     * Crea un estado nuevo y le pone un ID único 
+     * para que no se repitan en todo el programa.*/
     private static Estado nuevoEstado() {
         return new Estado(contadorEstados++);
     }
 
     /**
-     * Construye un AFN basico para un solo simbolo del alfabeto
-     * Crea un estado inicial y un estado final con una transicion directa
-     * @param simbolo el caracter que representa la transicion
-     * @return el AFN con dos estados conectados por el simbolo
-     */
+     * Arma un AFN chiquito para un solo símbolo. 
+     * Solo hace un puente directo del estado inicial al final.*/
     public static AFN crearSimbolo(char simbolo) {
         Estado inicio = nuevoEstado();
         Estado fin = nuevoEstado();
@@ -34,13 +28,9 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Concatena dos AFN en serie uno despues del otro
-     * Conecta el estado final del primero con el inicial del segundo mediante epsilon
-     * El resultado tiene el inicio del primer AFN y el fin del segundo AFN
-     * @param afn1 el primer automata
-     * @param afn2 el segundo automata
-     * @return el AFN concatenado
-     */
+     * Pega dos AFNs en fila. 
+     * Une el final del primer autómata con el inicio del segundo 
+     * usando un salto vacío.*/
     public static AFN concatenar(AFN afn1, AFN afn2) {
         AFN resultado = new AFN(afn1.getEstadoInicial(), afn2.getEstadoFinal());
         clonarTransiciones(afn1, resultado);
@@ -50,13 +40,9 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Construye la union de dos AFN usando el operador OR
-     * Crea un nuevo estado inicial con transiciones epsilon hacia ambos automatas
-     * Crea un nuevo estado final que recibe epsilon desde ambos automatas
-     * @param afn1 el primer automata
-     * @param afn2 el segundo automata
-     * @return el AFN que representa la union de ambos
-     */
+     * Une dos AFNs como opciones separadas, un OR. 
+     * Crea un inicio y un fin nuevos, y los conecta a las entradas 
+     * y salidas de ambos autómatas con saltos.*/
     public static AFN unirO(AFN afn1, AFN afn2) {
         Estado nuevoInicio = nuevoEstado();
         Estado nuevoFin = nuevoEstado();
@@ -74,14 +60,9 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Aplica la estrella de Kleene al AFN cero o mas repeticiones
-     * Agrega epsilon desde el nuevo inicio al nuevo fin
-     * Agrega epsilon desde el nuevo inicio al inicio original
-     * Agrega epsilon desde el final original al nuevo fin
-     * Agrega epsilon desde el final original al inicio original
-     * @param afn el automata al que aplicar la estrella
-     * @return el AFN con la operacion estrella aplicada
-     */
+     * Le aplica la estrella de Kleene *. 
+     * Te deja repetir el autómata las veces que quieras ciclando al inicio, 
+     * o saltártelo por completo yendo directo al final.*/
     public static AFN aplicarEstrella(AFN afn) {
         Estado nuevoInicio = nuevoEstado();
         Estado nuevoFin = nuevoEstado();
@@ -98,12 +79,9 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Aplica el operador mas al AFN una o mas repeticiones
-     * Similar a la estrella pero sin permitir cero repeticiones
-     * No tiene la transicion epsilon directa del inicio al fin
-     * @param afn el automata al que aplicar el mas
-     * @return el AFN con la operacion mas aplicada
-     */
+     * Le aplica el operador Más +. 
+     * Es igual que la estrella te deja repetir en ciclo, pero aquí 
+     * sí o sí tienes que pasar por el autómata al menos una vez.*/
     public static AFN aplicarMas(AFN afn) {
         Estado nuevoInicio = nuevoEstado();
         Estado nuevoFin = nuevoEstado();
@@ -119,12 +97,9 @@ public class AlgoritmoThompson {
     }
 
     /**
-     * Clona todas las transiciones de un AFN origen a un AFN destino
-     * Itera sobre cada estado y cada simbolo copiando los destinos
-     * Util para construir nuevos automatas sin perder las transiciones originales
-     * @param origen el AFN del cual copiar las transiciones
-     * @param destino el AFN al cual agregar las transiciones copiadas
-     */
+     * Copia todas las rutas de un AFN a otro. 
+     * Sirve para no perder los caminos originales cuando vamos 
+     * armando autómatas más grandes juntando varios pedazos.*/
     private static void clonarTransiciones(AFN origen, AFN destino) {
         for (Map.Entry<Estado, Map<Character, List<Estado>>> entrada : origen.getTablaTransiciones().entrySet()) {
             Estado estOrigen = entrada.getKey();

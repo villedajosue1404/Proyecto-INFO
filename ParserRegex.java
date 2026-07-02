@@ -1,23 +1,18 @@
 /**
- * Analizador sintactico de expresiones regulares
- * Usa el metodo de analisis descendente recursivo
- * Convierte la expresion en un AFN usando la construccion de Thompson
- * Soporta letras mayusculas y minusculas digitos operador pipe estrella mas y parentesis
- */
+ * Lector de expresiones regulares.
+ * Lee el texto paso a paso y arma un AFN usando el algoritmo de Thompson.
+ * Soporta letras, números, el O,  | , * , + y paréntesis.*/
 class ParserRegex {
 
     private String textoRegex;
     private int posicionActual;
 
     /**
-     * Metodo estatico principal para analizar una expresion regular
-     * Limpia la expresion quitando los espacios en blanco
-     * Crea un parser nuevo y procesa la expresion completa
-     * @param expresion la cadena que contiene la expresion regular
-     * @return el AFN equivalente a la expresion regular
-     */
+     * Comienza el análisis, 
+     * Primero le quita los espacios al texto porque no sirven para nada, 
+     * y luego pone a trabajar al parser para que arme el AFN completo.*/
     public static AFN parse(String expresion) {
-        // Eliminamos los espacios en blanco porque no tienen significado
+        // Eliminamos los espacios en blanco
         String textoLimpio = "";
         for (int i = 0; i < expresion.length(); i++) {
             char caracter = expresion.charAt(i);
@@ -32,9 +27,8 @@ class ParserRegex {
     }
 
     /**
-     * Constructor privado que inicializa el parser con el texto ya limpio
-     * La posicion actual empieza en cero
-     * @param texto la expresion regular sin espacios en blanco
+     * Prepara el parser con el texto limpio y 
+     * lo pone en la línea de salida (posición cero).
      */
     private ParserRegex(String texto) {
         this.textoRegex = texto;
@@ -42,19 +36,17 @@ class ParserRegex {
     }
 
     /**
-     * Procesa una expresion completa separada por el operador pipe
-     * Lee un termino y luego mientras haya pipes lee otro termino y los une
-     * Si no hay pipe devuelve el termino unico
-     * @return el AFN de la expresion o null si esta vacia
+     * Revisa si hay opciones separadas por la barrita |. 
+     * Va leyendo los pedazos y los une con la operación O si encuentra una.
      */
     private AFN procesarExpresion() {
         AFN resultado = procesarTermino();
 
-        // Mientras haya un pipe en la posicion actual seguimos uniendo terminos
+        // Mientras haya un pipe, seguimos uniendo términos
         while (posicionActual < textoRegex.length()) {
             char caracterActual = textoRegex.charAt(posicionActual);
             if (caracterActual == '|') {
-                posicionActual = posicionActual + 1; // Avanzamos para saltar el pipe
+                posicionActual = posicionActual + 1; // Saltamos el pipe
                 AFN otroTermino = procesarTermino();
                 if (otroTermino != null) {
                     if (resultado == null) {
@@ -64,7 +56,6 @@ class ParserRegex {
                     }
                 }
             } else {
-                // Ya no hay mas pipes entonces salimos del ciclo
                 break;
             }
         }
@@ -73,10 +64,8 @@ class ParserRegex {
     }
 
     /**
-     * Procesa un termino que es una secuencia de factores concatenados
-     * Lee el primer factor y mientras haya mas factores los va concatenando
-     * Detecta si el siguiente caracter puede iniciar un factor
-     * @return el AFN del termino o null si no hay ningun factor
+     * Pega los pedazos que van uno detrás del otro concatenación. 
+     * Revisa si lo que sigue es una letra, número o paréntesis, y los forma en fila.
      */
     private AFN procesarTermino() {
         AFN primerFactor = procesarFactor();
@@ -84,27 +73,19 @@ class ParserRegex {
             return null;
         }
 
-        // Verificamos si el siguiente caracter puede iniciar un factor
+        // Vemos si el siguiente carácter puede iniciar otro bloque
         while (posicionActual < textoRegex.length()) {
             char siguiente = textoRegex.charAt(posicionActual);
             boolean esLetra = false;
             boolean esDigito = false;
             boolean esParentesis = false;
 
-            if (siguiente >= 'a' && siguiente <= 'z') {
-                esLetra = true;
-            }
-            if (siguiente >= 'A' && siguiente <= 'Z') {
-                esLetra = true;
-            }
-            if (siguiente >= '0' && siguiente <= '9') {
-                esDigito = true;
-            }
-            if (siguiente == '(') {
-                esParentesis = true;
-            }
+            if (siguiente >= 'a' && siguiente <= 'z') esLetra = true;
+            if (siguiente >= 'A' && siguiente <= 'Z') esLetra = true;
+            if (siguiente >= '0' && siguiente <= '9') esDigito = true;
+            if (siguiente == '(') esParentesis = true;
 
-            if (esLetra == true || esDigito == true || esParentesis == true) {
+            if (esLetra || esDigito || esParentesis) {
                 AFN siguienteFactor = procesarFactor();
                 if (siguienteFactor != null) {
                     primerFactor = AlgoritmoThompson.concatenar(primerFactor, siguienteFactor);
@@ -118,9 +99,9 @@ class ParserRegex {
     }
 
     /**
-     * Procesa un factor que puede ser un simbolo individual una expresion entre
-     * parentesis o una letra o digito cada uno opcionalmente seguido de estrella o mas
-     * @return el AFN del factor o null si no hay mas caracteres que procesar
+     * Agarra un símbolo suelto o un grupo entre paréntesis.
+     * Luego se fija si tiene un operador de repetición * o + 
+     * pegado al final para aplicárselo de una vez.
      */
     private AFN procesarFactor() {
         if (posicionActual >= textoRegex.length()) {
@@ -129,21 +110,21 @@ class ParserRegex {
 
         char caracter = textoRegex.charAt(posicionActual);
 
-        // CASO 1: Grupo entre parentesis procesamos el interior y luego operadores
+        // CASO 1: Grupo entre paréntesis
         if (caracter == '(') {
-            posicionActual = posicionActual + 1; // Avanzamos para saltar el parentesis que abre
+            posicionActual = posicionActual + 1; // Saltamos el '('
 
             AFN expresionInterna = procesarExpresion();
 
-            // Verificamos que haya un parentesis que cierra la expresion
+            // Verificamos el cierre ')'
             if (posicionActual < textoRegex.length()) {
                 char posibleCierre = textoRegex.charAt(posicionActual);
                 if (posibleCierre == ')') {
-                    posicionActual = posicionActual + 1; // Avanzamos para saltar el parentesis que cierra
+                    posicionActual = posicionActual + 1;
                 }
             }
 
-            // Aplicamos los operadores estrella o mas si aparecen despues del grupo
+            // Checamos si tiene * o + pegado al grupo
             while (posicionActual < textoRegex.length()) {
                 char operador = textoRegex.charAt(posicionActual);
                 if (operador == '*') {
@@ -160,26 +141,20 @@ class ParserRegex {
             return expresionInterna;
         }
 
-        // CASO 2: El caracter es una letra o digito del alfabeto
+        // CASO 2: Es una letra o un dígito
         boolean esLetra = false;
         boolean esDigito = false;
 
-        if (caracter >= 'a' && caracter <= 'z') {
-            esLetra = true;
-        }
-        if (caracter >= 'A' && caracter <= 'Z') {
-            esLetra = true;
-        }
-        if (caracter >= '0' && caracter <= '9') {
-            esDigito = true;
-        }
+        if (caracter >= 'a' && caracter <= 'z') esLetra = true;
+        if (caracter >= 'A' && caracter <= 'Z') esLetra = true;
+        if (caracter >= '0' && caracter <= '9') esDigito = true;
 
-        if (esLetra == true || esDigito == true) {
-            posicionActual = posicionActual + 1; // Avanzamos para consumir el simbolo
+        if (esLetra || esDigito) {
+            posicionActual = posicionActual + 1; // Consumimos el símbolo
 
             AFN afnSimbolo = AlgoritmoThompson.crearSimbolo(caracter);
 
-            // Aplicamos estrella o mas si aparecen despues del simbolo
+            // Checamos si tiene * o + pegado a la letra/número
             while (posicionActual < textoRegex.length()) {
                 char operador = textoRegex.charAt(posicionActual);
                 if (operador == '*') {
@@ -196,7 +171,6 @@ class ParserRegex {
             return afnSimbolo;
         }
 
-        // Si llegamos aqui es que no se pudo procesar ningun factor valido
         return null;
     }
 }
