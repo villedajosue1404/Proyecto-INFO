@@ -91,7 +91,7 @@ public class AFN {
         boolean tieneEpsilon = false;
         for (Estado est : listaEstados) {
             Map<Character, List<Estado>> trans = tablaTransiciones.get(est);
-            if (trans != null && trans.containsKey('ε')) {
+            if (trans != null && trans.containsKey('z')) {
                 tieneEpsilon = true;
                 break;
             }
@@ -108,7 +108,7 @@ public class AFN {
         }
         if (tieneEpsilon) {
             if (!primero) sb.append(",");
-            sb.append("ε");
+            sb.append("z");
         }
         sb.append("\n");
 
@@ -146,8 +146,8 @@ public class AFN {
             for (Estado est : listaEstados) {
                 if (!primeroE) sb.append(",");
                 Map<Character, List<Estado>> trans = tablaTransiciones.get(est);
-                if (trans != null && trans.containsKey('ε')) {
-                    List<Estado> destinos = trans.get('ε');
+                if (trans != null && trans.containsKey('z')) {
+                    List<Estado> destinos = trans.get('z');
                     boolean primeroD = true;
                     for (Estado d : destinos) {
                         if (!primeroD) sb.append(" ");
@@ -172,7 +172,7 @@ public class AFN {
         Set<Character> alfabeto = new HashSet<>();
         for (Map<Character, List<Estado>> trans : tablaTransiciones.values()) {
             for (Character c : trans.keySet()) {
-                if (c != 'ε') {
+                if (c != 'z') {
                     alfabeto.add(c);
                 }
             }
@@ -195,8 +195,8 @@ public class AFN {
                 resultado.add(actual);
                 Map<Character, List<Estado>> trans = tablaTransiciones.get(actual);
                 // Si el estado tiene transiciones épsilon las seguimos
-                if (trans != null && trans.containsKey('ε')) {
-                    for (Estado dest : trans.get('ε')) {
+                if (trans != null && trans.containsKey('z')) {
+                    for (Estado dest : trans.get('z')) {
                         pila.push(dest);
                     }
                 }

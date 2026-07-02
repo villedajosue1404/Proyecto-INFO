@@ -189,7 +189,7 @@ public class TestProyecto {
         AFN afn = ParserRegex.parse(er);
 
         if (afn == null) {
-            System.out.println(" [WARN] No se pudo generar AFN para la ER vacia (ε)");
+            System.out.println(" [WARN] No se pudo generar AFN para la ER vacia (z)");
             return;
         }
         System.out.println(" Transiciones:");

@@ -24,7 +24,7 @@ public class AlgoritmoThompson {
         Estado inicio = nuevoEstado();
         Estado fin = nuevoEstado();
         AFN afn = new AFN(inicio, fin);
-        afn.agregarTransicion(inicio, fin, 'ε');
+        afn.agregarTransicion(inicio, fin, 'z');
         return afn;
     }
 
@@ -48,7 +48,7 @@ public class AlgoritmoThompson {
         AFN resultado = new AFN(afn1.getEstadoInicial(), afn2.getEstadoFinal());
         clonarTransiciones(afn1, resultado);
         clonarTransiciones(afn2, resultado);
-        resultado.agregarTransicion(afn1.getEstadoFinal(), afn2.getEstadoInicial(), 'ε');
+        resultado.agregarTransicion(afn1.getEstadoFinal(), afn2.getEstadoInicial(), 'z');
         return resultado;
     }
 
@@ -64,10 +64,10 @@ public class AlgoritmoThompson {
         clonarTransiciones(afn1, resultado);
         clonarTransiciones(afn2, resultado);
 
-        resultado.agregarTransicion(nuevoInicio, afn1.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(nuevoInicio, afn2.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(afn1.getEstadoFinal(), nuevoFin, 'ε');
-        resultado.agregarTransicion(afn2.getEstadoFinal(), nuevoFin, 'ε');
+        resultado.agregarTransicion(nuevoInicio, afn1.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(nuevoInicio, afn2.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(afn1.getEstadoFinal(), nuevoFin, 'z');
+        resultado.agregarTransicion(afn2.getEstadoFinal(), nuevoFin, 'z');
 
         return resultado;
     }
@@ -83,10 +83,10 @@ public class AlgoritmoThompson {
 
         clonarTransiciones(afn, resultado);
 
-        resultado.agregarTransicion(afn.getEstadoFinal(), afn.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(nuevoInicio, nuevoFin, 'ε');
-        resultado.agregarTransicion(nuevoInicio, afn.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(afn.getEstadoFinal(), nuevoFin, 'ε');
+        resultado.agregarTransicion(afn.getEstadoFinal(), afn.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(nuevoInicio, nuevoFin, 'z');
+        resultado.agregarTransicion(nuevoInicio, afn.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(afn.getEstadoFinal(), nuevoFin, 'z');
 
         return resultado;
     }
@@ -102,9 +102,9 @@ public class AlgoritmoThompson {
 
         clonarTransiciones(afn, resultado);
 
-        resultado.agregarTransicion(afn.getEstadoFinal(), afn.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(nuevoInicio, afn.getEstadoInicial(), 'ε');
-        resultado.agregarTransicion(afn.getEstadoFinal(), nuevoFin, 'ε');
+        resultado.agregarTransicion(afn.getEstadoFinal(), afn.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(nuevoInicio, afn.getEstadoInicial(), 'z');
+        resultado.agregarTransicion(afn.getEstadoFinal(), nuevoFin, 'z');
 
         return resultado;
     }
