@@ -1,9 +1,0 @@
-abb
-aabb
-bababb
-aaabb
-bbbbabb
-a
-ab
-abba
-bba
