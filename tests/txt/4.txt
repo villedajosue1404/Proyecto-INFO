@@ -1,9 +1,0 @@
-abb
-aabb
-babb
-bababb
-ε
-a
-ab
-aba
-abba
