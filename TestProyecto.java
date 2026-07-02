@@ -425,18 +425,24 @@ public class TestProyecto {
         java.util.Set<String> nombres = new java.util.TreeSet<>();
 
         File dirER = new File("tests/er/");
-        for (File f : dirER.listFiles()) {
-            String nom = f.getName();
-            if (nom.endsWith(".er")) {
-                nombres.add(nom.substring(0, nom.length() - 3));
+        File[] archivosER = dirER.listFiles();
+        if (archivosER != null) {
+            for (File f : archivosER) {
+                String nom = f.getName();
+                if (nom.endsWith(".er")) {
+                    nombres.add(nom.substring(0, nom.length() - 3));
+                }
             }
         }
 
         File dirAFD = new File("tests/afd/");
-        for (File f : dirAFD.listFiles()) {
-            String nom = f.getName();
-            if (nom.endsWith(".afd")) {
-                nombres.add(nom.substring(0, nom.length() - 4));
+        File[] archivosAFD = dirAFD.listFiles();
+        if (archivosAFD != null) {
+            for (File f : archivosAFD) {
+                String nom = f.getName();
+                if (nom.endsWith(".afd")) {
+                    nombres.add(nom.substring(0, nom.length() - 4));
+                }
             }
         }
 
